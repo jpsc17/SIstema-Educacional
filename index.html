@@ -805,8 +805,8 @@
         <div class="chart-card">
             <div class="chart-header">
                 <div class="chart-title-group">
-                    <h3 class="chart-title">Complexidade de Gestão</h3>
-                    <span class="chart-subtitle">Nível reformulado 2025</span>
+                    <h3 class="chart-title">Comparativo de Complexidade</h3>
+                    <span class="chart-subtitle">Evolução Inep 2024 vs 2025</span>
                 </div>
             </div>
             <div class="chart-canvas-wrapper">
@@ -1106,42 +1106,69 @@
         const ctx = document.getElementById('graficoComplexidade').getContext('2d');
         if (chartComplexidade) chartComplexidade.destroy();
 
-        const campo = 'Nível de complexidade de gestão da escola 2025 (REFORMULADO)';
-        const campoAlt = 'Nível de complexidade de gestão da escola 2025';
-        const contagem = {};
+        const contagem2024 = {};
+        const contagem2025 = {};
+        const contagemRef = {};
 
         dados.forEach(item => {
-            let nivel = (item[campo] || item[campoAlt] || '').toString().trim();
-            if (nivel) {
-                contagem[nivel] = (contagem[nivel] || 0) + 1;
-            }
+            let n24 = (item['Nível de complexidade de gestão da escola Inep 2024'] || '').toString().trim();
+            let n25 = (item['Nível de complexidade de gestão da escola 2025'] || '').toString().trim();
+            let nRef = (item['Nível de complexidade de gestão da escola 2025 (REFORMULADO)'] || '').toString().trim();
+
+            if (n24) contagem2024[n24] = (contagem2024[n24] || 0) + 1;
+            if (n25) contagem2025[n25] = (contagem2025[n25] || 0) + 1;
+            if (nRef) contagemRef[nRef] = (contagemRef[nRef] || 0) + 1;
         });
 
-        const sorted = Object.entries(contagem).sort((a, b) => {
-            const nA = parseInt(a[0].replace(/\D/g, '')) || 0;
-            const nB = parseInt(b[0].replace(/\D/g, '')) || 0;
-            return nA - nB;
+        // Pegar todos os níveis existentes e ordenar
+        const allKeys = new Set([...Object.keys(contagem2024), ...Object.keys(contagem2025), ...Object.keys(contagemRef)]);
+        const labels = Array.from(allKeys).filter(k => k.toLowerCase().includes('nível')).sort((a, b) => {
+             const nA = parseInt(a.replace(/\D/g, '')) || 0;
+             const nB = parseInt(b.replace(/\D/g, '')) || 0;
+             return nA - nB;
         });
 
-        const labels = sorted.map(([k]) => k);
-        const valores = sorted.map(([, v]) => v);
-        const coresNivel = ['rgba(16,185,129,0.8)', 'rgba(34,197,94,0.8)', 'rgba(245,158,11,0.8)', 'rgba(249,115,22,0.8)', 'rgba(239,68,68,0.8)', 'rgba(190,18,60,0.8)'];
+        const data24 = labels.map(l => contagem2024[l] || 0);
+        const data25 = labels.map(l => contagem2025[l] || 0);
+        const dataRef = labels.map(l => contagemRef[l] || 0);
 
         chartComplexidade = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels,
-                datasets: [{
-                    label: 'Escolas',
-                    data: valores,
-                    backgroundColor: coresNivel.slice(0, labels.length),
-                }]
+                datasets: [
+                    {
+                        label: '2024 (Inep)',
+                        data: data24,
+                        backgroundColor: 'rgba(99, 102, 241, 0.8)', // Indigo
+                        borderRadius: 4,
+                    },
+                    {
+                        label: '2025 (Inicial)',
+                        data: data25,
+                        backgroundColor: 'rgba(245, 158, 11, 0.8)', // Amber
+                        borderRadius: 4,
+                    },
+                    {
+                        label: '2025 (Reformulado)',
+                        data: dataRef,
+                        backgroundColor: 'rgba(16, 185, 129, 0.8)', // Emerald
+                        borderRadius: 4,
+                    }
+                ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 animation: { duration: 900, easing: 'easeOutQuart' },
-                plugins: { legend: { display: false }, tooltip: tooltipConfig },
+                plugins: { 
+                    legend: { 
+                        display: true, 
+                        position: 'top',
+                        labels: { boxWidth: 12, font: { size: 11 } }
+                    }, 
+                    tooltip: tooltipConfig 
+                },
                 scales: {
                     x: { grid: { display: false }, ticks: { font: { size: 11, weight: 600 } } },
                     y: { beginAtZero: true, grid: { color: 'rgba(99,130,202,0.06)' } }
@@ -1286,10 +1313,12 @@
         const tipos = ['ESTADUAL', 'ANEXO'];
         const locais = ['URBANA', 'RURAL'];
         const portes = ['Porte até 150 matrículas', 'Porte entre 150 e 1000 matrículas', 'Porte acima de 1000 matrículas'];
-        const niveis = ['Nível 1', 'Nível 2', 'Nível 3', 'Nível 4', 'Nível 5'];
+        const niveis = ['Nível 1', 'Nível 2', 'Nível 3', 'Nível 4', 'Nível 5', 'Nível 6'];
         const municipios = ['BELEM', 'ANANINDEUA', 'MARABA', 'SANTAREM', 'CASTANHAL', 'ABAETETUBA', 'ALTAMIRA', 'BREVES', 'TUCURUI', 'PARAGOMINAS'];
         const demo = [];
         for (let i = 0; i < 120; i++) {
+            let baseNivel = Math.floor(Math.random() * 4) + 1; // 1 to 4
+            let refNivel = baseNivel + (Math.random() > 0.5 ? 1 : 0);
             demo.push({
                 dre: dres[Math.floor(Math.random() * dres.length)],
                 nome_municipio: municipios[Math.floor(Math.random() * municipios.length)],
@@ -1297,7 +1326,9 @@
                 'TIPO DE ESCOLA': Math.random() > 0.25 ? 'ESTADUAL' : 'ANEXO',
                 'Matricula Considerada 2025': Math.floor(Math.random() * 1500) + 50,
                 'PORTE ESCOLA 2025': portes[Math.floor(Math.random() * portes.length)],
-                'Nível de complexidade de gestão da escola 2025 (REFORMULADO)': niveis[Math.floor(Math.random() * niveis.length)],
+                'Nível de complexidade de gestão da escola Inep 2024': 'Nível ' + baseNivel,
+                'Nível de complexidade de gestão da escola 2025': 'Nível ' + refNivel,
+                'Nível de complexidade de gestão da escola 2025 (REFORMULADO)': 'Nível ' + (refNivel > 1 && Math.random() > 0.6 ? refNivel - 1 : refNivel),
             });
         }
         return demo;
