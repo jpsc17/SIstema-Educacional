@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Gerencial de Infraestrutura Escolar</title>
+    <meta name="description" content="Painel gerencial interativo para análise de infraestrutura escolar com dados em tempo real, gráficos dinâmicos e indicadores de desempenho.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        /* ===== CSS RESET & VARIABLES ===== */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        :root {
+            /* Primary palette */
+            --primary-900: #0c1a3a;
+            --primary-800: #0f2554;
+            --primary-700: #143678;
+            --primary-600: #1a4a9e;
+            --primary-500: #2563eb;
+            --primary-400: #4f83f0;
+            --primary-300: #7da5f5;
+            --primary-200: #b3ccfa;
+            --primary-100: #dce8fd;
+            --primary-50: #eff4ff;
+            /* Accent */
+            --accent-500: #f59e0b;
+            --accent-400: #fbbf24;
+            --accent-300: #fcd34d;
+            /* Success */
+            --success-500: #10b981;
+            --success-400: #34d399;
+            /* Warning */
+            --warning-500: #f97316;
+            --warning-400: #fb923c;
+            /* Danger */
+            --danger-500: #ef4444;
+            --danger-400: #f87171;
+            /* Neutrals */
+            --gray-900: #111827;
+            --gray-800: #1f2937;
+            --gray-700: #374151;
+            --gray-600: #4b5563;
+            --gray-500: #6b7280;
+            --gray-400: #9ca3af;
+            --gray-300: #d1d5db;
+            --gray-200: #e5e7eb;
+            --gray-100: #f3f4f6;
+            --gray-50: #f9fafb;
+            --white: #ffffff;
+            /* Surfaces */
+            --bg-body: #0b1121;
+            --bg-surface: rgba(17, 24, 54, 0.7);
+            --bg-card: rgba(24, 33, 66, 0.55);
+            --bg-card-hover: rgba(30, 41, 82, 0.7);
+            --border-color: rgba(99, 130, 202, 0.15);
+            --border-glow: rgba(37, 99, 235, 0.3);
+            /* Typography */
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            /* Spacing */
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --space-10: 40px;
+            --space-12: 48px;
+            /* Radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-full: 9999px;
+            /* Shadows */
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 14px rgba(0,0,0,0.35);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.4);
+            --shadow-glow: 0 0 30px rgba(37, 99, 235, 0.15);
+            /* Transitions */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* ===== BASE ===== */
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        /* Background pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% 10%, rgba(37, 99, 235, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 80% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse 50% 30% at 50% 50%, rgba(37, 99, 235, 0.05) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        /* Grid dots */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: radial-gradient(rgba(99, 130, 202, 0.07) 1px, transparent 1px);
+            background-size: 32px 32px;
+            pointer-events: none;
+            z-index: 0;
+        }
+        /* ===== LAYOUT ===== */
+        .app-wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: var(--space-6) var(--space-5);
+        }
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, rgba(139, 92, 246, 0.1) 50%, rgba(37, 99, 235, 0.08) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--space-8) var(--space-10);
+            margin-bottom: var(--space-8);
+            position: relative;
+            overflow: hidden;
+            animation: slideDown 0.6s ease-out;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--primary-500), var(--accent-400), var(--success-400), var(--primary-500));
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: var(--space-5);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-5);
+        }
+        .header-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-lg);
+            background: linear-gradient(135deg, var(--primary-500), #7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            flex-shrink: 0;
+        }
+        .header-text h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--white) 0%, var(--primary-200) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header-text p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-top: var(--space-1);
+        }
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            color: var(--success-400);
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-full);
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+        .header-badge .pulse {
+            width: 8px; height: 8px;
+            background: var(--success-400);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
+        }
+        /* ===== KPI CARDS ===== */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-5);
+            margin-bottom: var(--space-8);
+        }
+        .kpi-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-base);
+            animation: fadeInUp 0.5s ease-out both;
+        }
+        .kpi-card:nth-child(1) { animation-delay: 0.1s; }
+        .kpi-card:nth-child(2) { animation-delay: 0.2s; }
+        .kpi-card:nth-child(3) { animation-delay: 0.3s; }
+        .kpi-card:nth-child(4) { animation-delay: 0.4s; }
+        .kpi-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-glow);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+        .kpi-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%; height: 3px;
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+        }
+        .kpi-card:nth-child(1)::after { background: linear-gradient(90deg, var(--primary-500), var(--primary-400)); }
+        .kpi-card:nth-child(2)::after { background: linear-gradient(90deg, var(--success-500), var(--success-400)); }
+        .kpi-card:nth-child(3)::after { background: linear-gradient(90deg, var(--accent-500), var(--accent-400)); }
+        .kpi-card:nth-child(4)::after { background: linear-gradient(90deg, var(--danger-500), var(--danger-400)); }
+        .kpi-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-4);
+        }
+        .kpi-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .kpi-icon {
+            width: 40px; height: 40px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .kpi-card:nth-child(1) .kpi-icon { background: rgba(37, 99, 235, 0.15); }
+        .kpi-card:nth-child(2) .kpi-icon { background: rgba(16, 185, 129, 0.15); }
+        .kpi-card:nth-child(3) .kpi-icon { background: rgba(245, 158, 11, 0.15); }
+        .kpi-card:nth-child(4) .kpi-icon { background: rgba(239, 68, 68, 0.15); }
+        .kpi-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: var(--space-2);
+        }
+        .kpi-card:nth-child(1) .kpi-value { color: var(--primary-400); }
+        .kpi-card:nth-child(2) .kpi-value { color: var(--success-400); }
+        .kpi-card:nth-child(3) .kpi-value { color: var(--accent-400); }
+        .kpi-card:nth-child(4) .kpi-value { color: var(--danger-400); }
+        .kpi-trend {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-1);
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+        }
+        .kpi-trend.up {
+            color: var(--success-400);
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .kpi-trend.down {
+            color: var(--danger-400);
+            background: rgba(239, 68, 68, 0.1);
+        }
+        .kpi-trend.neutral {
+            color: var(--accent-400);
+            background: rgba(245, 158, 11, 0.1);
+        }
+        /* ===== CHART CARDS ===== */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-5);
+            margin-bottom: var(--space-8);
+        }
+        .chart-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            transition: all var(--transition-base);
+            animation: fadeInUp 0.6s ease-out both;
+        }
+        .chart-card:nth-child(1) { animation-delay: 0.2s; }
+        .chart-card:nth-child(2) { animation-delay: 0.3s; }
+        .chart-card:nth-child(3) { animation-delay: 0.4s; }
+        .chart-card:nth-child(4) { animation-delay: 0.5s; }
+        .chart-card:hover {
+            border-color: var(--border-glow);
+            box-shadow: var(--shadow-glow);
+        }
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+        }
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-6);
+        }
+        .chart-title-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+        }
+        .chart-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .chart-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .chart-filter {
+            display: flex;
+            gap: var(--space-2);
+        }
+        .filter-btn {
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 500;
+            font-family: var(--font-family);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: rgba(37, 99, 235, 0.15);
+            border-color: var(--primary-500);
+            color: var(--primary-400);
+        }
+        .chart-canvas-wrapper {
+            position: relative;
+            width: 100%;
+            min-height: 280px;
+        }
+        .chart-canvas-wrapper canvas {
+            width: 100% !important;
+        }
+        /* ===== TABLE CARD ===== */
+        .table-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            margin-bottom: var(--space-8);
+            animation: fadeInUp 0.7s ease-out both;
+            animation-delay: 0.5s;
+            overflow: hidden;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead th {
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: var(--space-3) var(--space-4);
+            border-bottom: 1px solid var(--border-color);
+        }
+        tbody td {
+            padding: var(--space-4);
+            font-size: 0.88rem;
+            color: var(--text-primary);
+            border-bottom: 1px solid rgba(99, 130, 202, 0.07);
+            transition: background var(--transition-fast);
+        }
+        tbody tr:hover td {
+            background: rgba(37, 99, 235, 0.05);
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-1);
+            padding: 3px 10px;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .status-badge.bom {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--success-400);
+        }
+        .status-badge.regular {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--accent-400);
+        }
+        .status-badge.critico {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--danger-400);
+        }
+        .status-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+        }
+        .status-badge.bom .status-dot { background: var(--success-400); }
+        .status-badge.regular .status-dot { background: var(--accent-400); }
+        .status-badge.critico .status-dot { background: var(--danger-400); }
+        .progress-bar-bg {
+            width: 100%;
+            max-width: 120px;
+            height: 6px;
+            background: rgba(255,255,255,0.06);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: var(--radius-full);
+            transition: width 1s ease-out;
+        }
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: var(--space-8) 0 var(--space-4);
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            animation: fadeInUp 0.8s ease-out both;
+            animation-delay: 0.6s;
+        }
+        .footer a {
+            color: var(--primary-400);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        /* ===== LOADING STATE ===== */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-body);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loader {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-5);
+        }
+        .loader-spinner {
+            width: 48px; height: 48px;
+            border: 3px solid rgba(37, 99, 235, 0.15);
+            border-top-color: var(--primary-500);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loader-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        /* ===== ANIMATIONS ===== */
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 640px) {
+            .app-wrapper { padding: var(--space-4) var(--space-3); }
+            .header { padding: var(--space-5) var(--space-5); }
+            .header-content { flex-direction: column; align-items: flex-start; }
+            .header-text h1 { font-size: 1.25rem; }
+            .kpi-grid { grid-template-columns: 1fr; }
+            .kpi-value { font-size: 1.7rem; }
+            .chart-header { flex-direction: column; gap: var(--space-3); align-items: flex-start; }
+            table { font-size: 0.8rem; }
+        }
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(99, 130, 202, 0.2); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(99, 130, 202, 0.4); }
+    </style>
+</head>
+<body>
+<!-- Loading Screen -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loader">
+        <div class="loader-spinner"></div>
+        <span class="loader-text">Carregando dados da base...</span>
+    </div>
+</div>
+<div class="app-wrapper">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="header-icon">🏫</div>
+                <div class="header-text">
+                    <h1>Painel Gerencial de Infraestrutura Escolar</h1>
+                    <p>Transparência e Decisão Baseada em Dados</p>
+                </div>
+            </div>
+            <div class="header-badge">
+                <span class="pulse"></span>
+                <span>Dados Atualizados</span>
+            </div>
+        </div>
+    </header>
+    <!-- KPI Cards -->
+    <section class="kpi-grid" id="kpiGrid">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Total de Escolas</span>
+                <div class="kpi-icon">🏫</div>
+            </div>
+            <div class="kpi-value" id="kpiTotal">—</div>
+            <span class="kpi-trend up">↑ Rede Completa</span>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Ensino Fundamental</span>
+                <div class="kpi-icon">📚</div>
+            </div>
+            <div class="kpi-value" id="kpiFundamental">—</div>
+            <span class="kpi-trend up">↑ Maior cobertura</span>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Ensino Médio</span>
+                <div class="kpi-icon">🎓</div>
+            </div>
+            <div class="kpi-value" id="kpiMedio">—</div>
+            <span class="kpi-trend neutral">→ Estável</span>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Ensino Técnico</span>
+                <div class="kpi-icon">⚙️</div>
+            </div>
+            <div class="kpi-value" id="kpiTecnico">—</div>
+            <span class="kpi-trend down">↓ Expansão necessária</span>
+        </div>
+    </section>
+    <!-- Charts -->
+    <section class="charts-grid">
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title-group">
+                    <h3 class="chart-title">Escolas por Categoria</h3>
+                    <span class="chart-subtitle">Distribuição do total de unidades</span>
+                </div>
+                <div class="chart-filter">
+                    <button class="filter-btn active" id="btnBar" onclick="toggleChartType('bar')">Barras</button>
+                    <button class="filter-btn" id="btnLine" onclick="toggleChartType('line')">Linha</button>
+                </div>
+            </div>
+            <div class="chart-canvas-wrapper">
+                <canvas id="graficoEscolas"></canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title-group">
+                    <h3 class="chart-title">Proporção por Modalidade</h3>
+                    <span class="chart-subtitle">Participação percentual</span>
+                </div>
+            </div>
+            <div class="chart-canvas-wrapper">
+                <canvas id="graficoPizza"></canvas>
+            </div>
+        </div>
+        <div class="chart-card full-width">
+            <div class="chart-header">
+                <div class="chart-title-group">
+                    <h3 class="chart-title">Condição da Infraestrutura</h3>
+                    <span class="chart-subtitle">Avaliação geral por categoria</span>
+                </div>
+            </div>
+            <div class="chart-canvas-wrapper">
+                <canvas id="graficoInfra"></canvas>
+            </div>
+        </div>
+    </section>
+    <!-- Data Table -->
+    <section class="table-card">
+        <div class="chart-header">
+            <div class="chart-title-group">
+                <h3 class="chart-title">Detalhamento por Região</h3>
+                <span class="chart-subtitle">Indicadores regionais de infraestrutura</span>
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <table id="tabelaRegioes">
+                <thead>
+                    <tr>
+                        <th>Região</th>
+                        <th>Escolas</th>
+                        <th>Alunos Atendidos</th>
+                        <th>Condição</th>
+                        <th>Cobertura</th>
+                    </tr>
+                </thead>
+                <tbody id="corpoTabela">
+                    <!-- Populated dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2026 Painel Gerencial de Infraestrutura Escolar &middot; Atualizado em tempo real via <a href="#">Google Sheets</a></p>
+    </footer>
+</div>
+<script>
+    // ===== CONFIG =====
+    const urlAPI = 'https://script.google.com/macros/s/AKfycbxFvB6LPK97TkP8B56x_LZlEDZ7qNDUIxD0QYpTCLqcel-uEh2fmTQdIjZvY-fm6-r-QQ/exec';
+    // ===== CHART.JS GLOBAL CONFIG =====
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    Chart.defaults.font.weight = 500;
+    Chart.defaults.plugins.legend.labels.usePointStyle = true;
+    Chart.defaults.plugins.legend.labels.pointStyleWidth = 12;
+    Chart.defaults.plugins.legend.labels.padding = 20;
+    Chart.defaults.elements.bar.borderRadius = 6;
+    Chart.defaults.elements.bar.borderSkipped = false;
+    // ===== CHART INSTANCES =====
+    let chartEscolas = null;
+    let chartPizza = null;
+    let chartInfra = null;
+    let currentChartType = 'bar';
+    // ===== GRADIENT HELPERS =====
+    function createGradient(ctx, color1, color2, height = 280) {
+        const gradient = ctx.createLinearGradient(0, 0, 0, height);
+        gradient.addColorStop(0, color1);
+        gradient.addColorStop(1, color2);
+        return gradient;
+    }
+    // ===== COUNTER ANIMATION =====
+    function animateValue(el, start, end, duration = 1200) {
+        const startTime = performance.now();
+        function update(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            // Ease-out cubic
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = Math.round(start + (end - start) * eased);
+            el.textContent = current.toLocaleString('pt-BR');
+            if (progress < 1) requestAnimationFrame(update);
+        }
+        requestAnimationFrame(update);
+    }
+    // ===== KPI UPDATE =====
+    function atualizarKPIs(fundamental, medio, tecnico) {
+        const total = fundamental + medio + tecnico;
+        animateValue(document.getElementById('kpiTotal'), 0, total);
+        animateValue(document.getElementById('kpiFundamental'), 0, fundamental, 1400);
+        animateValue(document.getElementById('kpiMedio'), 0, medio, 1600);
+        animateValue(document.getElementById('kpiTecnico'), 0, tecnico, 1800);
+    }
+    // ===== CHART: ESCOLAS POR CATEGORIA =====
+    function renderizarGraficoEscolas(labels, valores, tipo = 'bar') {
+        const canvas = document.getElementById('graficoEscolas');
+        const ctx = canvas.getContext('2d');
+        if (chartEscolas) chartEscolas.destroy();
+        const colors = [
+            { bg: 'rgba(37, 99, 235, 0.8)', border: '#2563eb' },
+            { bg: 'rgba(245, 158, 11, 0.8)', border: '#f59e0b' },
+            { bg: 'rgba(16, 185, 129, 0.8)', border: '#10b981' }
+        ];
+        const bgColors = colors.map(c => c.bg);
+        const borderColors = colors.map(c => c.border);
+        const dataset = {
+            label: 'Unidades Escolares',
+            data: valores,
+            backgroundColor: tipo === 'bar'
+                ? bgColors
+                : createGradient(ctx, 'rgba(37, 99, 235, 0.3)', 'rgba(37, 99, 235, 0.02)'),
+            borderColor: tipo === 'bar' ? borderColors : '#2563eb',
+            borderWidth: tipo === 'bar' ? 0 : 2.5,
+            tension: 0.4,
+            fill: tipo === 'line',
+            pointBackgroundColor: '#2563eb',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: tipo === 'line' ? 5 : 0,
+            pointHoverRadius: tipo === 'line' ? 8 : 0,
+        };
+        chartEscolas = new Chart(ctx, {
+            type: tipo,
+            data: { labels: labels, datasets: [dataset] },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 800,
+                    easing: 'easeOutQuart'
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        borderColor: 'rgba(99, 130, 202, 0.2)',
+                        borderWidth: 1,
+                        padding: 14,
+                        cornerRadius: 10,
+                        titleFont: { size: 13, weight: 700 },
+                        bodyFont: { size: 12 },
+                        displayColors: true,
+                        boxPadding: 6,
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(99, 130, 202, 0.06)' },
+                        ticks: { font: { weight: 600 } }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(99, 130, 202, 0.06)' },
+                        ticks: { stepSize: 10 }
+                    }
+                }
+            }
+        });
+    }
+    // ===== CHART: PIZZA/DOUGHNUT =====
+    function renderizarGraficoPizza(labels, valores) {
+        const ctx = document.getElementById('graficoPizza').getContext('2d');
+        if (chartPizza) chartPizza.destroy();
+        chartPizza = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: valores,
+                    backgroundColor: [
+                        'rgba(37, 99, 235, 0.85)',
+                        'rgba(245, 158, 11, 0.85)',
+                        'rgba(16, 185, 129, 0.85)',
+                    ],
+                    borderColor: 'rgba(11, 17, 33, 0.8)',
+                    borderWidth: 3,
+                    hoverOffset: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '68%',
+                animation: {
+                    animateRotate: true,
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 24,
+                            font: { size: 12, weight: 600 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        borderColor: 'rgba(99, 130, 202, 0.2)',
+                        borderWidth: 1,
+                        padding: 14,
+                        cornerRadius: 10,
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const pct = ((context.parsed / total) * 100).toFixed(1);
+                                return ` ${context.label}: ${context.parsed} (${pct}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    // ===== CHART: INFRAESTRUTURA =====
+    function renderizarGraficoInfra() {
+        const ctx = document.getElementById('graficoInfra').getContext('2d');
+        if (chartInfra) chartInfra.destroy();
+        chartInfra = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Salas de Aula', 'Laboratórios', 'Biblioteca', 'Quadra Esportiva', 'Acessibilidade', 'Internet'],
+                datasets: [
+                    {
+                        label: 'Adequado',
+                        data: [68, 35, 42, 28, 22, 55],
+                        backgroundColor: 'rgba(16, 185, 129, 0.75)',
+                        borderRadius: 4,
+                    },
+                    {
+                        label: 'Parcial',
+                        data: [20, 25, 18, 15, 20, 12],
+                        backgroundColor: 'rgba(245, 158, 11, 0.75)',
+                        borderRadius: 4,
+                    },
+                    {
+                        label: 'Inadequado',
+                        data: [12, 40, 40, 57, 58, 33],
+                        backgroundColor: 'rgba(239, 68, 68, 0.65)',
+                        borderRadius: 4,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 900,
+                    easing: 'easeOutQuart'
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { font: { size: 12, weight: 600 }, padding: 20 }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        borderColor: 'rgba(99, 130, 202, 0.2)',
+                        borderWidth: 1,
+                        padding: 14,
+                        cornerRadius: 10,
+                        callbacks: {
+                            label: function(context) {
+                                return ` ${context.dataset.label}: ${context.parsed.y}%`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        grid: { display: false },
+                        ticks: { font: { size: 11, weight: 600 } }
+                    },
+                    y: {
+                        stacked: true,
+                        max: 100,
+                        grid: { color: 'rgba(99, 130, 202, 0.06)' },
+                        ticks: {
+                            callback: v => v + '%',
+                            stepSize: 25
+                        }
+                    }
+                }
+            }
+        });
+    }
+    // ===== TABLE =====
+    function renderizarTabela() {
+        const regioes = [
+            { nome: 'Norte', escolas: 18, alunos: '12.400', cond: 'regular', perc: 62 },
+            { nome: 'Sul', escolas: 22, alunos: '18.200', cond: 'bom', perc: 88 },
+            { nome: 'Leste', escolas: 15, alunos: '9.800', cond: 'critico', perc: 41 },
+            { nome: 'Oeste', escolas: 10, alunos: '7.600', cond: 'regular', perc: 55 },
+            { nome: 'Centro', escolas: 7, alunos: '5.200', cond: 'bom', perc: 92 },
+        ];
+        const condLabels = { bom: 'Bom', regular: 'Regular', critico: 'Crítico' };
+        const corpo = document.getElementById('corpoTabela');
+        corpo.innerHTML = regioes.map(r => {
+            const barColor = r.cond === 'bom' ? '#10b981' : r.cond === 'regular' ? '#f59e0b' : '#ef4444';
+            return `
+                <tr>
+                    <td style="font-weight:600;">${r.nome}</td>
+                    <td>${r.escolas}</td>
+                    <td>${r.alunos}</td>
+                    <td>
+                        <span class="status-badge ${r.cond}">
+                            <span class="status-dot"></span>
+                            ${condLabels[r.cond]}
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width:${r.perc}%;background:${barColor};"></div>
+                            </div>
+                            <span style="font-size:0.8rem;font-weight:600;color:var(--text-secondary);">${r.perc}%</span>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+    // ===== TOGGLE CHART TYPE =====
+    function toggleChartType(tipo) {
+        currentChartType = tipo;
+        document.getElementById('btnBar').classList.toggle('active', tipo === 'bar');
+        document.getElementById('btnLine').classList.toggle('active', tipo === 'line');
+        const chart = chartEscolas;
+        if (chart) {
+            const labels = chart.data.labels;
+            const data = chart.data.datasets[0].data;
+            renderizarGraficoEscolas(labels, data, tipo);
+        }
+    }
+    // ===== MAIN LOAD FUNCTION =====
+    async function carregarDados() {
+        const overlay = document.getElementById('loadingOverlay');
+        try {
+            const resposta = await fetch(urlAPI);
+            const dados = await resposta.json();
+            console.log('📊 Dados carregados da planilha:', dados);
+            // Count categories from data
+            let fundamental = 0, medio = 0, tecnico = 0;
+            if (Array.isArray(dados)) {
+                dados.forEach(item => {
+                    const cat = (item.categoria || item.Categoria || item.CATEGORIA || '').toLowerCase().trim();
+                    if (cat.includes('fundamental')) fundamental++;
+                    else if (cat.includes('médio') || cat.includes('medio')) medio++;
+                    else if (cat.includes('técnico') || cat.includes('tecnico')) tecnico++;
+                });
+            }
+            // Fallback to demo data if no categories found
+            if (fundamental === 0 && medio === 0 && tecnico === 0) {
+                fundamental = 45;
+                medio = 22;
+                tecnico = 5;
+            }
+            const labels = ['Fundamental', 'Médio', 'Técnico'];
+            const valores = [fundamental, medio, tecnico];
+            // Render all
+            atualizarKPIs(fundamental, medio, tecnico);
+            renderizarGraficoEscolas(labels, valores, 'bar');
+            renderizarGraficoPizza(labels, valores);
+            renderizarGraficoInfra();
+            renderizarTabela();
+        } catch (erro) {
+            console.error('❌ Erro ao carregar a base de dados:', erro);
+            // Use demo data on error
+            const labels = ['Fundamental', 'Médio', 'Técnico'];
+            const valores = [45, 22, 5];
+            atualizarKPIs(45, 22, 5);
+            renderizarGraficoEscolas(labels, valores, 'bar');
+            renderizarGraficoPizza(labels, valores);
+            renderizarGraficoInfra();
+            renderizarTabela();
+        } finally {
+            // Hide loading
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                setTimeout(() => overlay.remove(), 500);
+            }, 400);
+        }
+    }
+    // ===== INIT =====
+    carregarDados();
+</script>
+</body>
+</html>
