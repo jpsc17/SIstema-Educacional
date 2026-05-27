@@ -180,6 +180,14 @@ th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
   .canvas-wrap { page-break-inside: avoid; break-inside: avoid; }
   canvas { max-width: 100% !important; height: auto !important; }
 }
+
+.light-theme .sidebar { background: #FFFFFF; border-right: 1px solid var(--border); }
+.light-theme .sidebar .nav-item { color: var(--text-muted); }
+.light-theme .sidebar .nav-item:hover, .light-theme .sidebar .nav-item.active { background: var(--gov-blue-alpha); color: var(--gov-blue); }
+.light-theme .sidebar .brand { color: var(--gov-blue); }
+.light-theme .topbar { background: #FFFFFF; border-bottom: 1px solid var(--border); }
+.light-theme .topbar .top-action { background: #F1F5F9; color: var(--text-main); }
+.light-theme .topbar .top-action:hover { background: #E2E8F0; }
 </style>
 </head>
 <body>
@@ -464,6 +472,33 @@ th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
       </div>
     </div>
 
+    <!-- view-qualidade (IDEB) -->
+    <div class="view" id="view-qualidade">
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:1.5rem; margin-bottom:1.5rem;">
+        <div class="card kpi-card">
+          <div class="kpi-title">IDEB Atual (Ensino Médio)</div>
+          <div class="kpi-value">3.6</div>
+          <div class="kpi-trend trend-up">↑ 0.4 pts (vs 2021)</div>
+        </div>
+        <div class="card kpi-card">
+          <div class="kpi-title">Meta do Estado (2025)</div>
+          <div class="kpi-value">4.0</div>
+          <div class="kpi-trend trend-up">80% da meta atingida</div>
+        </div>
+        <div class="card kpi-card">
+          <div class="kpi-title">Aprovação (Taxa de Rendimento)</div>
+          <div class="kpi-value">91.2%</div>
+          <div class="kpi-trend trend-up">↑ 2.1% (Ano a ano)</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Evolução Histórica do IDEB - Rede Estadual</div>
+        </div>
+        <div class="chart-wrap" style="height: 300px;"><canvas id="cIdeb"></canvas></div>
+      </div>
+    </div>
+
   </div>
 </main>
 
@@ -517,7 +552,11 @@ function getFilters(){
 
 function applyFilters(){
   const f=getFilters();
+
+  const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
   filtered=ROWS.filter(r=>{
+    if(q && !r.nome.toLowerCase().includes(q)) return false;
+
     if(f.dre && r.dre!==f.dre)return false;
     if(f.mun && r.mun!==f.mun)return false;
     if(f.tipo && r.tipo!==f.tipo)return false;
@@ -558,7 +597,7 @@ function populateSelects(){
 }
 
 // ===== NAV =====
-const TITLES={visao:'Visão Geral do Estado',perfil:'Perfil e Estrutura das Escolas',complexidade:'Análise de Complexidade de Gestão',regional:'Detalhamento por Diretoria Regional'};
+const TITLES={visao:'Visão Geral do Estado',perfil:'Perfil e Estrutura das Escolas',complexidade:'Análise de Complexidade de Gestão',regional:'Detalhamento por Diretoria Regional',qualidade:'Qualidade e Metas (IDEB)'};
 function go(id){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.querySelector(`[onclick="go(\'${id}\')"]`).classList.add('active');
@@ -750,9 +789,9 @@ function toggleTheme() {
 
 // ===== EXPORT CSV =====
 function exportCSV() {
-  if(!window.currentFiltered || window.currentFiltered.length === 0) return alert("Nenhum dado para exportar.");
+  if(!filtered || filtered.length === 0) return alert("Nenhum dado para exportar.");
   let csv = "INEP,Escola,Municipio,DRE,Localizacao,Porte,Matriculas,Complexidade\n";
-  window.currentFiltered.forEach(e => {
+  filtered.forEach(e => {
     csv += `"${e.inep}","${e.esc}","${e.mun}","${e.dre}","${e.loc}","${e.porte}",${e.mat},"${e.comp}"\n`;
   });
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -792,8 +831,8 @@ function renderMap() {
 
   // Calculate size per DRE based on current filtered data
   const counts = {};
-  if(window.currentFiltered) {
-    window.currentFiltered.forEach(e => counts[e.dre] = (counts[e.dre]||0)+1);
+  if(filtered) {
+    filtered.forEach(e => counts[e.dre] = (counts[e.dre]||0)+1);
   }
 
   for(let dre in counts) {
