@@ -852,21 +852,23 @@ function renderMap() {
 // ===== IDEB CHART =====
 function renderIdebChart() {
   if(CHARTS['cIdeb']) destroyChart('cIdeb');
-  CHARTS['cIdeb'] = new Chart(document.getElementById('cIdeb'), {
+  const ctx = document.getElementById('cIdeb');
+  if(!ctx) return;
+  CHARTS['cIdeb'] = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ['2019', '2021', '2023'],
+      labels: ['2019', '2021', '2023', '2024', '2025', '2026'],
       datasets: [
-        { label: 'Ensino Médio (Realizado)', data: [3.4, 3.6, 3.8], backgroundColor: '#2563EB', borderRadius: 4 },
-        { label: 'Meta', data: [3.5, 3.6, 3.7], backgroundColor: '#10B981', borderRadius: 4 }
+        { label: 'Realizado / Projeção', data: [3.4, 3.6, 3.8, 3.9, 4.2, null], backgroundColor: '#2563EB', borderRadius: 4 },
+        { label: 'Meta do Estado', data: [3.5, 3.6, 3.7, 4.0, 4.3, 4.8], type: 'line', borderColor: '#10B981', borderWidth: 2, borderDash: [5,5], fill: false, tension: 0 }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: '#94A3B8' } } },
+      plugins: { legend: { labels: { color: '#94A3B8' }, position: 'bottom' } },
       scales: {
         x: { grid: { display: false }, ticks: { color: '#94A3B8' } },
-        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8' } }
+        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8' }, beginAtZero: true, max: 5.0 }
       }
     }
   });
