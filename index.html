@@ -605,7 +605,10 @@ function go(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+id).classList.add('active');
 
-  if(id==='geo') setTimeout(renderMap, 100);
+  if(id==='regional') {
+    setTimeout(renderMap, 100);
+    setTimeout(()=> { if(typeof mapInstance !== 'undefined' && mapInstance) mapInstance.invalidateSize(); }, 300);
+  }
   if(id==='qualidade') setTimeout(renderIdebChart, 100);
 
   document.getElementById('pageTitle').textContent=TITLES[id];
