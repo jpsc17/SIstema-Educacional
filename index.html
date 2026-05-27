@@ -810,13 +810,22 @@ function exportCSV() {
 
 // ===== LEAFLET MAP =====
 let mapInstance = null;
-const dreCoords = {
-  "DRE Belém": [-1.45502,-48.5024],
-  "DRE Marabá": [-5.3686,-49.12],
-  "DRE Santarém": [-2.44306,-54.7083],
-  "DRE Altamira": [-3.20333,-52.2064],
-  "DRE Castanhal": [-1.29683,-47.9265]
+const coordsMap = {
+  "BELEM": [-1.45502,-48.5024], "ANANINDEUA": [-1.3638,-48.374], "MARABA": [-5.3686,-49.12],
+  "SANTAREM": [-2.44306,-54.7083], "ALTAMIRA": [-3.20333,-52.2064], "CASTANHAL": [-1.29683,-47.9265],
+  "ABAETETUBA": [-1.72,-48.88], "AFUA": [-0.15,-50.38], "BRAGANCA": [-1.05,-46.76],
+  "CAPANEMA": [-1.19,-47.17], "BREVES": [-1.68,-50.48], "TUCURUI": [-3.76,-49.67],
+  "CONCEICAO": [-8.25,-49.26], "REDENCAO": [-8.02,-50.03], "PARAGOMINAS": [-2.99,-47.35],
+  "CAMETA": [-2.24,-49.49], "CAPITAO POCO": [-1.74,-47.06], "ITAIITUBA": [-4.27,-55.98]
 };
+
+function getCoord(dreName) {
+  const n = dreName.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  for(let key in coordsMap) { if(n.includes(key)) return coordsMap[key]; }
+  // Add slight random offset for unknown DREs so they don't perfectly overlap
+  const hash = n.split('').reduce((a,b)=>{a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);
+  return [-3.2 + (hash%10)*0.2, -52.2 + (hash%15)*0.2];
+}
 
 function renderMap() {
   if(!mapInstance) {
@@ -828,28 +837,24 @@ function renderMap() {
   
   // Clear existing markers
   mapInstance.eachLayer(layer => {
-    if(layer instanceof L.CircleMarker) {
-      mapInstance.removeLayer(layer);
-    }
+    if(layer instanceof L.CircleMarker) mapInstance.removeLayer(layer);
   });
 
-  // Calculate size per DRE based on current filtered data
   const counts = {};
-  if(filtered) {
+  if(typeof filtered !== 'undefined' && filtered) {
     filtered.forEach(e => counts[e.dre] = (counts[e.dre]||0)+1);
   }
 
   for(let dre in counts) {
-    if(dreCoords[dre]) {
-      L.circleMarker(dreCoords[dre], {
-        radius: Math.max(8, counts[dre] / 30),
-        fillColor: "#2563EB",
-        color: "#1E40AF",
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.6
-      }).addTo(mapInstance).bindPopup(`<b>${dre}</b><br>${counts[dre]} escolas filtradas`);
-    }
+    const c = getCoord(dre);
+    L.circleMarker(c, {
+      radius: Math.max(8, counts[dre] / 20),
+      fillColor: "#2563EB",
+      color: "#1E40AF",
+      weight: 1,
+      opacity: 1,
+      fillOpacity: 0.7
+    }).addTo(mapInstance).bindPopup(`<b>${dre}</b><br>${counts[dre]} escolas filtradas`);
   }
 }
 
