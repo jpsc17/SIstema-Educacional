@@ -684,21 +684,7 @@ function renderRegional(d){
 
 // ===== SPLASH ANIMATION =====
 function runSplash(){
-  const fill=document.getElementById('splashFill');
-  const msg=document.getElementById('splashMsg');
-  const msgs=['Inicializando sistema...','Verificando responsividade...','Ajustando painéis...','Pronto!'];
-  let pct=0;let mi=0;
-  const iv=setInterval(()=>{
-    pct+=Math.random()*18+6;
-    if(pct>100)pct=100;
-    fill.style.width=pct+'%';
-    mi=Math.min(Math.floor(pct/25),msgs.length-1);
-    msg.textContent=msgs[mi];
-    if(pct>=100){
-      clearInterval(iv);
-      setTimeout(()=>document.getElementById('splash').classList.add('hide'),400);
-    }
-  },120);
+  setTimeout(()=>document.getElementById('splash').classList.add('hide'), 800);
 }
 
 // ===== INIT =====
