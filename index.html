@@ -47,17 +47,17 @@ body { font-family: var(--font); background: var(--bg); color: var(--text-main);
 .s-logo-text .mark { font-size: 1.1rem; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; line-height: 1.2; }
 .s-logo-text .sub { font-size: 0.65rem; color: var(--gov-blue-light); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
 
-.s-filters { padding: 20px 24px; border-bottom: 1px solid var(--border); }
-.filter-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 16px; }
-.filter-group { margin-bottom: 12px; }
-.filter-label { font-size: 0.7rem; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; display: block; }
-select.fsel { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text-main); font-family: var(--font); font-size: 0.8rem; padding: 8px 12px; border-radius: 6px; cursor: pointer; appearance: none; outline: none; transition: all 0.2s; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+.s-filters { padding: 16px; border-bottom: 1px solid var(--border); overflow-y: auto; max-height: 48vh; }
+.filter-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 12px; }
+.filter-group { margin-bottom: 8px; }
+.filter-label { font-size: 0.7rem; font-weight: 500; color: var(--text-muted); margin-bottom: 4px; display: block; }
+select.fsel { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text-main); font-family: var(--font); font-size: 0.75rem; padding: 6px 10px; border-radius: 6px; cursor: pointer; appearance: none; outline: none; transition: all 0.2s; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
 select.fsel:focus { border-color: var(--gov-blue-light); box-shadow: 0 0 0 2px var(--gov-blue-alpha); }
-.filter-reset { width: 100%; margin-top: 8px; padding: 8px 0; background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-family: var(--font); font-size: 0.75rem; font-weight: 500; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+.filter-reset { width: 100%; margin-top: 4px; padding: 6px 0; background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-family: var(--font); font-size: 0.75rem; font-weight: 500; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
 .filter-reset:hover { background: var(--border); color: var(--text-main); }
-.filter-count { display: inline-flex; align-items: center; font-size: 0.75rem; color: var(--gov-blue-light); font-weight: 600; padding: 4px 10px; background: var(--gov-blue-alpha); border-radius: 99px; margin-top: 12px; }
+.filter-count { display: inline-flex; align-items: center; font-size: 0.7rem; color: var(--gov-blue-light); font-weight: 600; padding: 4px 8px; background: var(--gov-blue-alpha); border-radius: 99px; margin-top: 8px; }
 
-.s-nav { flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
+.s-nav { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
 .nav-label { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; padding: 0 12px; margin-bottom: 8px; }
 .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; color: var(--text-muted); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s; position: relative; }
 .nav-item svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; flex-shrink: 0; opacity: 0.7; }
@@ -689,6 +689,19 @@ function renderRegional(d){
 // ===== SPLASH ANIMATION =====
 function runSplash(){
   setTimeout(()=>document.getElementById('splash').classList.add('hide'), 800);
+}
+
+// ===== FULLSCREEN =====
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(err => {
+      console.log("Erro ao tentar abrir tela cheia:", err.message);
+    });
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  }
 }
 
 // ===== INIT =====
