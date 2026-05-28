@@ -1,34 +1,54 @@
-# SGEP - Sistema de Gestão Escolar e Planejamento
+# SGEP - Painel de Inteligência Educacional
 
-**Relatório Final do Projeto Acadêmico (PoC)**
+![Status](https://img.shields.io/badge/Status-Concluído-success)
+![Vanilla JS](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E?logo=javascript&logoColor=black)
+![Python Tooling](https://img.shields.io/badge/Python-Tooling-3776AB?logo=python&logoColor=white)
 
-Este documento apresenta a reflexão final sobre a concepção e entrega do SGEP (Sistema de Gestão Escolar e Planejamento), um painel gerencial estático de alta performance desenvolvido sob medida para a Secretaria de Estado de Educação do Pará (SEDUC/PA). O ciclo de vida do software foi gerenciado no Jira, dividindo o escopo do MVP em 3 Sprints com entregas incrementais de valor.
+Um painel gerencial estático (dashboard) de alta performance desenvolvido para a Secretaria de Estado de Educação do Pará (SEDUC/PA), com foco na análise visual de métricas da rede escolar, inteligência geográfica e acompanhamento de metas do IDEB.
 
-## 1. Desafios da Gestão Pública Identificados
+## 🚀 Arquitetura e Tecnologias
 
-O projeto foi idealizado para resolver gargalos históricos na administração educacional do estado:
+Este projeto foi construído sob o princípio de **Custo Zero de Infraestrutura** e resiliência máxima, utilizando uma abordagem Single Page Application (SPA) totalmente estática, sem a necessidade de um backend ou banco de dados ativo.
 
-- **Mitigação da Complexidade:** Havia o desafio de mitigar a complexidade na leitura de grandes volumes de dados governamentais. O SGEP resolveu isso transformando planilhas brutas em indicadores visuais e acionáveis para tomadas de decisão estratégica.
-- **Democratização dos Dados:** Havia a necessidade de atuar diretamente na democratização interna dos dados de infraestrutura, matrículas e complexidade de gestão escolar. O sistema permitiu que servidores e diretores regionais filtrassem informações em tempo real sem a necessidade de softwares proprietários ou infraestruturas caras de banco de dados.
-- **Acessibilidade e Resiliência de Rede:** O sistema precisava garantir funcionamento 100% offline ou via redes móveis instáveis. Isso foi solucionado embutindo os dados diretamente no cliente em formato JSON, o que eliminou a latência de requisições de rede.
+### 💻 Frontend
+* **HTML5 & CSS3:** Interface responsiva construída nativamente (Vanilla), sem uso de frameworks pesados, garantindo carregamento instantâneo.
+* **JavaScript (Vanilla):** Lógica de estado, renderização condicional e manipulação de DOM nativos.
+* **[Chart.js](https://www.chartjs.org/):** Utilizado para renderização de todas as métricas analíticas e visuais (gráficos de barras, linhas, rosca).
+* **[Leaflet.js](https://leafletjs.com/):** Motor de inteligência geográfica utilizado para plotagem da concentração escolar e densidade de matrículas no mapa do estado.
 
-## 2. Reflexão sobre o Uso de Dados na Tomada de Decisão
+### 🛠️ Tooling & Scripts (Python)
+Para facilitar a manutenção de um arquivo monolítico, o projeto utiliza scripts **Python** como ferramentas de *build* e *patch*. Esses scripts leem o `index.html` e injetam novas lógicas programaticamente:
+* `apply_themes.py`: Injeta a dependência do Leaflet, adiciona o CSS dinâmico (Light/Dark mode) e regras de negócio para renderização geográfica.
+* `update_charts.py`: Manipula as propriedades do Chart.js injetadas no arquivo principal para modernizar o visual (bordas arredondadas, refinamento de grids e paletas de cores).
+* Outros scripts (`fix_all.py`, `merge.py`): Utilitários para gestão de DOM e versionamento do painel.
 
-A transição de um modelo de gestão baseado em suposições para uma cultura *data-driven* foi o principal impacto de negócio do SGEP:
+### 🗄️ Estrutura de Dados (Offline-First)
+Para garantir funcionamento 100% offline ou em redes instáveis no interior do estado, o banco de dados (matrículas, histórico do IDEB, níveis de complexidade) é embarcado diretamente no cliente como um **JSON estático** (`ROWS`). Isso elimina a latência de requisições HTTPS e consultas SQL.
 
-- **Fim do "Achismo":** O uso do SGEP na Gestão Educacional extingue o "achismo" gerencial.
-- **Identificação de Assimetrias:** O cruzamento visual de dados permite identificar instantaneamente assimetrias na rede, como Diretorias Regionais com alta densidade de alunos por escola rural.
-- **Monitoramento de Complexidade:** O sistema acompanha as migrações drásticas nos níveis de Complexidade de Gestão Escolar, focando exclusivamente nos indicadores históricos do Inep de 2023 ao Reformulado de 2025, sem usar dados da base da SEDUC para esta finalidade.
-- **Otimização de Recursos:** A leitura visual das assimetrias otimiza a alocação de recursos financeiros, merenda escolar, rotas de transporte e distribuição de professores.
+## ✨ Funcionalidades Principais
 
-## 3. Lições sobre Transparência e Eficiência (Metodologia Ágil)
+* **Filtros Dinâmicos e Herança:** Filtragem em tempo real por Diretoria Regional (DRE), Município, Tipo Administrativo, Zonamento (Urbano/Rural), Porte e Complexidade.
+* **Inteligência Geográfica:** Mapeamento em tempo real das escolas filtradas, exibindo o volume e densidade escolar via Leaflet.
+* **Exportação Dinâmica (CSV):** Geração local de arquivos CSV a partir dos dados atualmente filtrados na tela, sem chamadas a servidores.
+* **Temas e Acessibilidade:** Suporte nativo a *Light Theme* e *Dark Theme*.
+* **Modos de Visualização:** 
+  * *Modo Apresentação (Fullscreen):* Focado em reuniões de diretoria.
+  * *Modo Exportar PDF:* O CSS do sistema adapta automaticamente os gráficos e as quebras de página para impressão física (A4) ou geração de relatórios PDF.
 
-O desenvolvimento do SGEP provou que o setor público pode inovar com agilidade e eficiência tecnológica:
+## 📦 Como Executar
 
-- **Inovação no Setor Público:** O projeto serve como prova de conceito de que soluções governamentais robustas e de alto impacto visual podem ser desenvolvidas em ciclos ágeis rápidos. Soluções governamentais podem ser feitas sem onerar o orçamento público com licenças de software ou infraestruturas complexas de servidores.
-- **Arquitetura de Custo Zero:** A arquitetura foi concebida sob o princípio de custo zero de infraestrutura, utilizando uma *Single Page Application* (SPA) construída de forma enxuta em HTML5, CSS3 e JavaScript Nativo.
-- **Ferramentas de Transparência:** A transparência e o uso em processos administrativos foram facilitados pela inclusão do "Modo Exportar PDF", que gera relatórios perfeitos em formato A4. O sistema também incluiu um "Modo Apresentação" para eliminação de distrações em reuniões diretivas.
-- **Ciclos de Entrega (Sprints):** As entregas de valor foram eficientes devido à divisão em ciclos:
-  - **Sprint 1:** Tratamento da base de 951 registros escolares.
-  - **Sprint 2:** Desenvolvimento da lógica de negócio, herança de dados e filtros.
-  - **Sprint 3:** Finalização da integração visual com Chart.js, UI/UX e design responsivo.
+Por ser uma aplicação totalmente estática, não há necessidade de `npm install` ou servidores complexos.
+
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/jpsc17/SIstema-Educacional.git
+   ```
+2. Abra o arquivo `index.html` diretamente em qualquer navegador moderno (Chrome, Edge, Firefox, Safari).
+3. Para rodar os scripts de atualização em Python (caso deseje modificar algo estrutural):
+   ```bash
+   python apply_themes.py
+   python update_charts.py
+   ```
+
+---
+*Nota: Este é um projeto acadêmico (Prova de Conceito) desenvolvido com o intuito de demonstrar a viabilidade tecnológica de dashboards de alto impacto e baixo custo no setor público, não possuindo vínculo oficial ou acesso a dados sensíveis/fechados da SEDUC/PA.*
