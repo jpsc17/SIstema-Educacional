@@ -212,6 +212,14 @@ th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
   .canvas-wrap { page-break-inside: avoid; break-inside: avoid; }
   canvas { max-width: 100% !important; height: auto !important; }
 }
+
+.light-theme .sidebar { background: #FFFFFF; border-right: 1px solid var(--border); }
+.light-theme .sidebar .nav-item { color: var(--text-muted); }
+.light-theme .sidebar .nav-item:hover, .light-theme .sidebar .nav-item.active { background: var(--gov-blue-alpha); color: var(--gov-blue); }
+.light-theme .sidebar .brand { color: var(--gov-blue); }
+.light-theme .topbar { background: #FFFFFF; border-bottom: 1px solid var(--border); }
+.light-theme .topbar .top-action { background: #F1F5F9; color: var(--text-main); }
+.light-theme .topbar .top-action:hover { background: #E2E8F0; }
 </style>
 </head>
 <body>
@@ -511,6 +519,33 @@ th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
       </div>
     </div>
 
+    <!-- view-qualidade (IDEB) -->
+    <div class="view" id="view-qualidade">
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:1.5rem; margin-bottom:1.5rem;">
+        <div class="card kpi-card">
+          <div class="kpi-title">IDEB Atual (Ensino Médio)</div>
+          <div class="kpi-value">3.6</div>
+          <div class="kpi-trend trend-up">↑ 0.4 pts (vs 2021)</div>
+        </div>
+        <div class="card kpi-card">
+          <div class="kpi-title">Meta do Estado (2025)</div>
+          <div class="kpi-value">4.0</div>
+          <div class="kpi-trend trend-up">80% da meta atingida</div>
+        </div>
+        <div class="card kpi-card">
+          <div class="kpi-title">Aprovação (Taxa de Rendimento)</div>
+          <div class="kpi-value">91.2%</div>
+          <div class="kpi-trend trend-up">↑ 2.1% (Ano a ano)</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Evolução Histórica do IDEB - Rede Estadual</div>
+        </div>
+        <div class="chart-wrap" style="height: 300px;"><canvas id="cIdeb"></canvas></div>
+      </div>
+    </div>
+
   </div>
 </main>
 
@@ -550,8 +585,10 @@ const META={"dres": ["DRE - ABAETETUBA", "DRE - AFUA", "DRE - ALTAMIRA", "DRE - 
 
 // ===== MENU MOBILE SCRIPT =====
 function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('active');
-  document.querySelector('.sidebar-overlay').classList.toggle('active');
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar) sidebar.classList.toggle('active');
+  const overlay = document.querySelector('.sidebar-overlay');
+  if (overlay) overlay.classList.toggle('active');
 }
 
 // ===== CHART.JS GLOBALS =====
@@ -630,7 +667,8 @@ function applyFilters(){
   if(f.dre) updateMunOptions(f.dre);
   document.getElementById('filterCount').textContent=filtered.length+' escola'+(filtered.length!==1?'s':'');
   const anyActive=Object.values(f).some(v=>v);
-  document.getElementById('badgeFilter').style.display=anyActive?'inline-flex':'none';
+  const badge = document.getElementById('badgeFilter');
+  if (badge) badge.style.display = anyActive ? 'inline-flex' : 'none';
   renderAll();
 }
 
