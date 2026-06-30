@@ -33,28 +33,63 @@
 }
 body { font-family: var(--font); background: var(--bg); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; }
 
-/* ── SPLASH ── */
-#splash { position: fixed; inset: 0; z-index: 9999; background: radial-gradient(ellipse at 50% 40%, #0f1d35 0%, #0B1120 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.6s ease, transform 0.6s ease; }
-#splash.hide { opacity: 0; transform: scale(1.03); pointer-events: none; }
-#splash::before { content: ''; position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); width: 500px; height: 500px; background: radial-gradient(circle, rgba(37,99,235,0.12) 0%, transparent 70%); border-radius: 50%; pointer-events: none; animation: splashGlow 3s ease-in-out infinite alternate; }
-@keyframes splashGlow { from { opacity: 0.5; transform: translate(-50%, -50%) scale(0.9); } to { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } }
+/* ── LANDING PAGE ── */
+#splash { position: fixed; inset: 0; z-index: 9999; background: #080d1a; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; transition: opacity 0.7s ease, transform 0.7s ease; }
+#splash.hide { opacity: 0; transform: scale(1.02); pointer-events: none; }
 
-.splash-logo-wrap { position: relative; margin-bottom: 32px; animation: splashLogoIn 0.8s ease-out both; }
-@keyframes splashLogoIn { from { opacity: 0; transform: translateY(20px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
-.splash-logo-wrap::after { content: ''; position: absolute; inset: -6px; border-radius: 18px; background: linear-gradient(135deg, rgba(37,99,235,0.4), rgba(16,185,129,0.3), rgba(245,158,11,0.2)); z-index: -1; filter: blur(8px); animation: splashRingPulse 2s ease-in-out infinite alternate; }
-@keyframes splashRingPulse { from { opacity: 0.6; } to { opacity: 1; } }
-.splash-logo { height: 100px; width: 100px; object-fit: cover; border-radius: 14px; border: 2px solid rgba(255,255,255,0.15); box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 60px rgba(37,99,235,0.15); }
+/* Hero Section */
+.lp-hero { position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.lp-hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, #080d1a 0%, #0c1629 40%, #12132a 100%); z-index: 0; }
+.lp-hero::after { content: ''; position: absolute; top: -20%; right: -10%; width: 70%; height: 140%; background: linear-gradient(135deg, #c8102e 0%, #d4213d 50%, #b30e28 100%); transform: skewX(-12deg); z-index: 1; opacity: 0.12; filter: blur(60px); }
 
-.splash-brand { font-size: 2.4rem; font-weight: 700; letter-spacing: 6px; color: #fff; text-transform: uppercase; margin-bottom: 4px; animation: splashTextIn 0.8s 0.2s ease-out both; text-shadow: 0 0 30px rgba(37,99,235,0.3); }
-@keyframes splashTextIn { from { opacity: 0; transform: translateY(12px); letter-spacing: 20px; } to { opacity: 1; transform: translateY(0); letter-spacing: 6px; } }
-.splash-title { font-size: 1.1rem; font-weight: 400; color: var(--text-muted); letter-spacing: 1px; animation: splashTextIn 0.8s 0.35s ease-out both; }
-.splash-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; opacity: 0.7; animation: splashTextIn 0.8s 0.5s ease-out both; }
+/* Animated diagonal stripe accent */
+.lp-stripe { position: absolute; top: 0; right: 0; width: 55%; height: 100%; background: linear-gradient(135deg, transparent 0%, rgba(200,16,46,0.06) 30%, rgba(200,16,46,0.1) 50%, rgba(200,16,46,0.06) 70%, transparent 100%); transform: skewX(-12deg) translateX(10%); z-index: 1; }
+.lp-stripe::after { content: ''; position: absolute; top: 50%; left: 50%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(0,51,160,0.15) 0%, transparent 70%); transform: translate(-50%, -50%); border-radius: 50%; animation: heroStarGlow 4s ease-in-out infinite alternate; }
+@keyframes heroStarGlow { from { opacity: 0.4; transform: translate(-50%,-50%) scale(0.8); } to { opacity: 1; transform: translate(-50%,-50%) scale(1.3); } }
 
-.splash-loader { width: 200px; height: 3px; background: rgba(255,255,255,0.08); border-radius: 4px; margin-top: 40px; overflow: hidden; animation: splashTextIn 0.8s 0.6s ease-out both; }
-.splash-loader-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--gov-blue), var(--gov-blue-light), var(--green)); border-radius: 4px; animation: splashLoad 2s 0.8s ease-in-out forwards; }
-@keyframes splashLoad { 0% { width: 0%; } 60% { width: 70%; } 100% { width: 100%; } }
+/* Floating particles */
+.lp-particles { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+.lp-particle { position: absolute; width: 3px; height: 3px; background: rgba(255,255,255,0.15); border-radius: 50%; animation: particleFloat linear infinite; }
+@keyframes particleFloat { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-10vh) scale(1); opacity: 0; } }
 
-.splash-footer { position: absolute; bottom: 32px; font-size: 0.7rem; color: rgba(255,255,255,0.2); letter-spacing: 0.5px; animation: splashTextIn 0.8s 0.7s ease-out both; }
+.lp-hero-content { position: relative; z-index: 5; text-align: center; max-width: 700px; padding: 40px 24px; }
+
+/* Flag logo */
+.lp-flag-wrap { position: relative; display: inline-block; margin-bottom: 40px; }
+.lp-flag-wrap::before { content: ''; position: absolute; inset: -12px; border-radius: 28px; background: conic-gradient(from 0deg, rgba(200,16,46,0.3), rgba(0,51,160,0.3), rgba(255,255,255,0.1), rgba(200,16,46,0.3)); animation: flagRingRotate 6s linear infinite; filter: blur(10px); z-index: -1; }
+@keyframes flagRingRotate { to { transform: rotate(360deg); } }
+.lp-flag-wrap::after { content: ''; position: absolute; inset: -4px; border-radius: 22px; border: 1.5px solid rgba(255,255,255,0.1); z-index: 1; pointer-events: none; }
+.lp-flag { width: 120px; height: 120px; object-fit: cover; border-radius: 18px; box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 80px rgba(200,16,46,0.15), 0 0 80px rgba(0,51,160,0.1); display: block; }
+
+.lp-brand { font-size: 3.5rem; font-weight: 700; letter-spacing: 10px; color: #ffffff; text-transform: uppercase; margin-bottom: 8px; animation: lpFadeUp 0.8s 0.2s ease-out both; text-shadow: 0 4px 20px rgba(200,16,46,0.2); }
+.lp-brand span { background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 50%, #ffffff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+@keyframes lpFadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+
+.lp-tagline { font-size: 1.2rem; font-weight: 300; color: rgba(255,255,255,0.7); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; animation: lpFadeUp 0.8s 0.35s ease-out both; }
+.lp-desc { font-size: 0.95rem; color: rgba(255,255,255,0.4); max-width: 500px; margin: 0 auto 40px; line-height: 1.7; animation: lpFadeUp 0.8s 0.5s ease-out both; }
+
+/* CTA Button */
+.lp-cta { display: inline-flex; align-items: center; gap: 12px; padding: 16px 40px; font-family: var(--font); font-size: 1rem; font-weight: 600; letter-spacing: 1px; color: #fff; background: linear-gradient(135deg, #c8102e 0%, #a00d24 100%); border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 30px rgba(200,16,46,0.3), 0 2px 8px rgba(0,0,0,0.2); animation: lpFadeUp 0.8s 0.65s ease-out both; position: relative; overflow: hidden; text-decoration: none; }
+.lp-cta::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%); opacity: 0; transition: opacity 0.3s; }
+.lp-cta:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 12px 40px rgba(200,16,46,0.45), 0 4px 12px rgba(0,0,0,0.3); }
+.lp-cta:hover::before { opacity: 1; }
+.lp-cta:active { transform: translateY(0) scale(0.98); }
+.lp-cta svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s; }
+.lp-cta:hover svg { transform: translateX(4px); }
+
+/* Features Section */
+.lp-features { position: relative; z-index: 5; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 800px; margin: -60px auto 0; padding: 0 24px 60px; animation: lpFadeUp 0.8s 0.8s ease-out both; }
+.lp-feat { background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 28px 20px; text-align: center; transition: all 0.3s ease; }
+.lp-feat:hover { background: rgba(255,255,255,0.06); border-color: rgba(200,16,46,0.2); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+.lp-feat-ico { width: 48px; height: 48px; margin: 0 auto 16px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+.lp-feat-ico.red { background: rgba(200,16,46,0.12); color: #e8384f; }
+.lp-feat-ico.blue { background: rgba(0,51,160,0.15); color: #4d8bff; }
+.lp-feat-ico.white { background: rgba(255,255,255,0.08); color: #ffffff; }
+.lp-feat h3 { font-size: 0.85rem; font-weight: 600; color: rgba(255,255,255,0.9); margin-bottom: 6px; }
+.lp-feat p { font-size: 0.75rem; color: rgba(255,255,255,0.4); line-height: 1.5; }
+
+/* Footer */
+.lp-bottom { text-align: center; padding: 24px; font-size: 0.7rem; color: rgba(255,255,255,0.15); letter-spacing: 0.5px; border-top: 1px solid rgba(255,255,255,0.04); }
 
 /* ── SIDEBAR ── */
 .sidebar { width: var(--sidebar); background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(16px); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; z-index: 50; transition: left 0.3s ease; }
@@ -183,14 +218,44 @@ th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
 <body>
 
 <div id="splash">
-  <div class="splash-logo-wrap">
-    <img src="https://image.magnific.com/fotos-gratis/estado-da-bandeira-do-para-no-brasil_2227-693.jpg" class="splash-logo" alt="SGEP">
+  <!-- Hero Section -->
+  <section class="lp-hero">
+    <div class="lp-stripe"></div>
+    <div class="lp-particles" id="lpParticles"></div>
+    <div class="lp-hero-content">
+      <div class="lp-flag-wrap">
+        <img src="https://image.magnific.com/fotos-gratis/estado-da-bandeira-do-para-no-brasil_2227-693.jpg" class="lp-flag" alt="Bandeira do Pará">
+      </div>
+      <div class="lp-brand"><span>SGEP</span></div>
+      <div class="lp-tagline">Inteligência Educacional</div>
+      <p class="lp-desc">Plataforma de gestão estratégica da rede estadual de ensino do Pará. Dados em tempo real, análises inteligentes e indicadores para a tomada de decisão.</p>
+      <button class="lp-cta" onclick="enterDashboard()">
+        Acessar Painel
+        <svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <div class="lp-features">
+    <div class="lp-feat">
+      <div class="lp-feat-ico red">📊</div>
+      <h3>Dados em Tempo Real</h3>
+      <p>Matrículas, escolas e indicadores atualizados de toda a rede estadual</p>
+    </div>
+    <div class="lp-feat">
+      <div class="lp-feat-ico blue">🗺️</div>
+      <h3>Inteligência Geográfica</h3>
+      <p>Análise territorial por DRE, município e zonamento urbano/rural</p>
+    </div>
+    <div class="lp-feat">
+      <div class="lp-feat-ico white">⚡</div>
+      <h3>Gestão Estratégica</h3>
+      <p>Complexidade de gestão, porte institucional e métricas executivas</p>
+    </div>
   </div>
-  <div class="splash-brand">SGEP</div>
-  <div class="splash-title">Inteligência Educacional</div>
-  <div class="splash-sub">Governo do Estado do Pará</div>
-  <div class="splash-loader"><div class="splash-loader-bar"></div></div>
-  <div class="splash-footer">Sistema de Gestão Educacional do Pará &bull; 2026</div>
+
+  <div class="lp-bottom">SGEP &bull; Sistema de Gestão Educacional do Pará &bull; Governo do Estado do Pará &bull; 2026</div>
 </div>
 
 <aside class="sidebar" id="sidebar">
@@ -451,15 +516,29 @@ th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
 </main>
 
 <script>
-// ===== SPLASH SCREEN =====
-function runSplash() {
-  const splash = document.getElementById('splash');
+// ===== LANDING PAGE =====
+function enterDashboard() {
+  var splash = document.getElementById('splash');
   if (!splash) return;
-  setTimeout(function() {
-    splash.classList.add('hide');
-    setTimeout(function() { splash.style.display = 'none'; }, 700);
-  }, 3000);
+  splash.classList.add('hide');
+  setTimeout(function() { splash.style.display = 'none'; }, 800);
 }
+function runSplash() { /* Landing page mode — user clicks to enter */ }
+
+// Generate floating particles
+(function() {
+  var container = document.getElementById('lpParticles');
+  if (!container) return;
+  for (var i = 0; i < 30; i++) {
+    var p = document.createElement('div');
+    p.className = 'lp-particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDuration = (6 + Math.random() * 10) + 's';
+    p.style.animationDelay = (Math.random() * 8) + 's';
+    p.style.width = p.style.height = (2 + Math.random() * 3) + 'px';
+    container.appendChild(p);
+  }
+})();
 
 
 // =============================================================F============
