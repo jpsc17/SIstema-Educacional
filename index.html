@@ -795,9 +795,7 @@ function renderComplexidade(d){
   const d25 = lv.map(l=>d.comp25[l]||0);
   const dref = lv.map(l=>d.compref[l]||0);
 
-  document.getElementById('complexidadeLegendHTML').innerHTML = `
-    <div class="custom-legend">
-      <div class="legend-item"><div class="legend-box" style="background:#7F77DD;"></div>Inep 2023 (${d23.reduce((a,b)=>a+b,0)})</div>
+  "></div>Inep 2023 (${d23.reduce((a,b)=>a+b,0)})</div>
       <div class="legend-item"><div class="legend-box" style="background:#378ADD;"></div>Inep 2024 (${d24.reduce((a,b)=>a+b,0)})</div>
       <div class="legend-item"><div class="legend-box" style="background:#BA7517;"></div>Avaliação 2025 (${d25.reduce((a,b)=>a+b,0)})</div>
       <div class="legend-item"><div class="legend-box" style="background:#1D9E75;"></div>Reformulado 2025 (${dref.reduce((a,b)=>a+b,0)})</div>
@@ -972,9 +970,11 @@ function renderIdebChart() {
 }
 
 // ===== INIT =====
-populateSelects();
-applyFilters();
-runSplash();
+window.addEventListener('load', function() {
+  populateSelects();
+  applyFilters();
+  runSplash();
+});
 </script>
 </body>
 </html>
