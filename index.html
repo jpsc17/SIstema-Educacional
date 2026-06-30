@@ -34,17 +34,33 @@
 body { font-family: var(--font); background: var(--bg); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; }
 
 /* ── SPLASH ── */
-#splash { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s ease; }
-#splash.hide { opacity: 0; pointer-events: none; }
-.splash-logo { height: 72px; object-fit: contain; margin-bottom: 24px; opacity: 0.9; }
-.splash-title { font-size: 1.8rem; font-weight: 600; color: var(--text-main); letter-spacing: -0.5px; }
-.splash-sub { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+#splash { position: fixed; inset: 0; z-index: 9999; background: radial-gradient(ellipse at 50% 40%, #0f1d35 0%, #0B1120 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.6s ease, transform 0.6s ease; }
+#splash.hide { opacity: 0; transform: scale(1.03); pointer-events: none; }
+#splash::before { content: ''; position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); width: 500px; height: 500px; background: radial-gradient(circle, rgba(37,99,235,0.12) 0%, transparent 70%); border-radius: 50%; pointer-events: none; animation: splashGlow 3s ease-in-out infinite alternate; }
+@keyframes splashGlow { from { opacity: 0.5; transform: translate(-50%, -50%) scale(0.9); } to { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } }
+
+.splash-logo-wrap { position: relative; margin-bottom: 32px; animation: splashLogoIn 0.8s ease-out both; }
+@keyframes splashLogoIn { from { opacity: 0; transform: translateY(20px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.splash-logo-wrap::after { content: ''; position: absolute; inset: -6px; border-radius: 18px; background: linear-gradient(135deg, rgba(37,99,235,0.4), rgba(16,185,129,0.3), rgba(245,158,11,0.2)); z-index: -1; filter: blur(8px); animation: splashRingPulse 2s ease-in-out infinite alternate; }
+@keyframes splashRingPulse { from { opacity: 0.6; } to { opacity: 1; } }
+.splash-logo { height: 100px; width: 100px; object-fit: cover; border-radius: 14px; border: 2px solid rgba(255,255,255,0.15); box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 60px rgba(37,99,235,0.15); }
+
+.splash-brand { font-size: 2.4rem; font-weight: 700; letter-spacing: 6px; color: #fff; text-transform: uppercase; margin-bottom: 4px; animation: splashTextIn 0.8s 0.2s ease-out both; text-shadow: 0 0 30px rgba(37,99,235,0.3); }
+@keyframes splashTextIn { from { opacity: 0; transform: translateY(12px); letter-spacing: 20px; } to { opacity: 1; transform: translateY(0); letter-spacing: 6px; } }
+.splash-title { font-size: 1.1rem; font-weight: 400; color: var(--text-muted); letter-spacing: 1px; animation: splashTextIn 0.8s 0.35s ease-out both; }
+.splash-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; opacity: 0.7; animation: splashTextIn 0.8s 0.5s ease-out both; }
+
+.splash-loader { width: 200px; height: 3px; background: rgba(255,255,255,0.08); border-radius: 4px; margin-top: 40px; overflow: hidden; animation: splashTextIn 0.8s 0.6s ease-out both; }
+.splash-loader-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--gov-blue), var(--gov-blue-light), var(--green)); border-radius: 4px; animation: splashLoad 2s 0.8s ease-in-out forwards; }
+@keyframes splashLoad { 0% { width: 0%; } 60% { width: 70%; } 100% { width: 100%; } }
+
+.splash-footer { position: absolute; bottom: 32px; font-size: 0.7rem; color: rgba(255,255,255,0.2); letter-spacing: 0.5px; animation: splashTextIn 0.8s 0.7s ease-out both; }
 
 /* ── SIDEBAR ── */
 .sidebar { width: var(--sidebar); background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(16px); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; z-index: 50; transition: left 0.3s ease; }
-.s-logo { padding: 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid var(--border); }
-.s-logo img { height: 44px; object-fit: contain; }
-.s-logo-text .mark { font-size: 1.1rem; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; line-height: 1.2; }
+.s-logo { padding: 20px 24px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid var(--border); }
+.s-logo img { height: 40px; width: 40px; object-fit: cover; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.1); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+.s-logo-text .mark { font-size: 1.15rem; font-weight: 700; color: var(--text-main); letter-spacing: 2px; line-height: 1.2; }
 .s-logo-text .sub { font-size: 0.65rem; color: var(--gov-blue-light); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
 
 .s-filters { padding: 20px 24px; border-bottom: 1px solid var(--border); }
@@ -167,9 +183,14 @@ th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
 <body>
 
 <div id="splash">
-  <img src="https://image.magnific.com/fotos-gratis/estado-da-bandeira-do-para-no-brasil_2227-693.jpg" class="splash-logo" alt="SGEP">
+  <div class="splash-logo-wrap">
+    <img src="https://image.magnific.com/fotos-gratis/estado-da-bandeira-do-para-no-brasil_2227-693.jpg" class="splash-logo" alt="SGEP">
+  </div>
+  <div class="splash-brand">SGEP</div>
   <div class="splash-title">Inteligência Educacional</div>
-  <div class="splash-sub">Secretaria de Estado de Educação &mdash; Governo do Pará</div>
+  <div class="splash-sub">Governo do Estado do Pará</div>
+  <div class="splash-loader"><div class="splash-loader-bar"></div></div>
+  <div class="splash-footer">Sistema de Gestão Educacional do Pará &bull; 2026</div>
 </div>
 
 <aside class="sidebar" id="sidebar">
@@ -430,6 +451,16 @@ th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
 </main>
 
 <script>
+// ===== SPLASH SCREEN =====
+function runSplash() {
+  const splash = document.getElementById('splash');
+  if (!splash) return;
+  setTimeout(function() {
+    splash.classList.add('hide');
+    setTimeout(function() { splash.style.display = 'none'; }, 700);
+  }, 3000);
+}
+
 
 // =============================================================F============
 // COLE A SUA LISTA DE ESCOLAS GIGANTE AQUI (DENTRO DOS COLCHETES)
